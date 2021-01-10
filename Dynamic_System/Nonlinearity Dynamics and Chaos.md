@@ -343,3 +343,200 @@
     - "Going out of control": fixed point - large oscillation
   
     - Hysteresis: after $$\mu $$ becomes 0, reducing $$\mu$$ will not bring you back to the fixed point immediately (oscillation persists)
+  
+- Other bifurcations of periodic orbits:
+
+  - Saddle-node coalescence of limit cycles:
+
+    - $$\dot{r} = \mu r + r^3 - r^5, \dot{\theta} = \omega + br^2$$ (same as above)
+
+      <img src = "8-5.png" style = "zoom:60%"/>
+
+    - Reducing mu towards $$\mu_s = -\frac{1}{4}$$: the stable cycle and unstable cycle collide into a half-stable cycle (stable outside, unstable inside)
+
+      - If increasing mu, it seems that a large limit cycle is generated out of nowhere
+
+      <img src = "8-6.png" style = "zoom:40%"/>
+
+  - SNIPER:
+
+    - $$\dot{r} = r(1 - r^2), \dot{\theta} = \omega - \sin\theta$$
+
+    - Stable cycle (with changing speed) - half-stable node on the cycle (at the "slow" region) - two nodes on the cycle
+
+      <img src = "8-7.png" style = "zoom:40%"/>
+
+    - Consider the cartesian version of this dynamics (x over t):
+
+      <img src = "8-8.png" style = "zoom:40%"/>
+
+      - It can be shown the period of the pulse $$T \sim \frac{1}{\sqrt{\mu}}$$, where mu is the distance to the bifurcation value (e.g. $$|\omega - 1|$$)
+
+  - Homoclinic: A limit cycle approaches and touches a fixed point (See P266)
+
+- Summary:
+
+  - We can guess the type of bifurcations by the amplitude and period of the limit cycle around the bifurcation:
+
+    <img src = "8-9.png" style = "zoom:40%"/>
+
+## Coupled Oscillators and Quasiperiodicity
+
+- Dynamics on torus: two cyclic parameters, can also be represented on a pseudo-torus square (connecting the top and the bottom, the left and the right)
+
+- Example: $$\dot{\theta_1} = \omega_1, \dot{\theta_2} = \omega_2$$
+
+  - When $$\omega_1 / \omega_2 = p/q$$ is rational, the trajectories are closed; when p is not 1, the trajectories will form a torus knot, e.g. p = 2, q = 3:
+
+    <img src = "9-1.png" style = "zoom:40%"/>
+
+  - When irrational:
+
+    - Quasiperiodicity: the trajectories are not closed but will be dense over the torus
+    - Not chaotic: the distance between two (initially very close-by) points increases linearly with time, not exponentially
+
+- Coupled oscillators:
+
+  - $$\dot{\theta_1} = \omega_1 + K\sin(\theta_2 - \theta_1), \dot{\theta_2} = \omega_2 + K\sin(\theta_1 - \theta_2)$$, two synchronizing oscillators (faster one lowering the speed and vice versa)
+  - Let $$\phi = \theta_1 - \theta_2$$, then $$\dot{\phi} = \omega_1 - \omega_2 - 2K\sin\phi$$
+  - When K is large enough, there will be two fixed points (one stable one unstable) for phi, i.e. the two oscillators will be phase-locked
+
+## Chaos and Lorentz Equations
+
+- Consider the chaotic waterwheel (horizontal instead of vertical, but tilted)
+
+  <img src = "10-1.png" style = "zoom:40%"/>
+
+  - The brake at the center can change the friction of the wheel; the tilt can also be adjusted
+  - Parameters:
+    - r, radius of the wheel
+    - $$\omega(t)$$, angular velocity of the wheel
+    - $$\theta$$, angle in lab frame (top view of the wheel)
+    - $$Q(\theta)$$, the inflow rate of water at a certain angle
+    - $$m(\theta, t)$$, mass distribution of the water on the wheel
+  - Dynamics:
+    - Conservation of mass:
+      - $$\frac{\partial m}{\partial t} = Q - Km + \omega\frac{\partial m}{\partial \theta}$$, K is a constant representing the speed of outflow
+      - inflow, outflow proportional to the mass/pressure (note: all chambers are tilted with the same angle, so the tilting effect can be absorbed to K), and rotation-induced change
+      - $$\dot{M} = \int_0^{2\pi} Q - Km + \omega\frac{\partial m}{\partial \theta} d\theta = Q_{total} - KM$$, so $$\lim_{t \to \infin} M \to Q_{tot}/K$$
+    - Newton's low for torque balance: 
+      - Define the moment of inertia (转动惯量) of the wheel as I(t), then the time derivative of angular momentum $$\dot{(\omega I)} = -\nu \omega + gr\int_0^{2\pi} m(\theta, t)\sin\theta\ d\theta$$
+        - $$I = Mr^2 + I_{wheel}$$ will approach a constant as M becomes gradually static
+        - $$I\dot{\omega} = -\nu \omega + gr\int_0^{2\pi} m(\theta, t)\sin\theta\ d\theta$$
+      - F is the torque (扭矩）due to gravity
+        - the torque in sector $$d\theta$$: $$d\tau = dM\ gr \sin \theta$$, where $$g = g_0\sin\alpha$$ represents the acceleration "leftward" (in the top view) caused by gravity
+      - $$\nu$$ represents both:
+        - the effect that water comes in without angular momentum but comes out with a certain one
+        - the linear damping (somehow similar to friction) caused by the brake
+    - Overall:
+      - $$\frac{\partial m}{\partial t} = Q - Km + \omega\frac{\partial m}{\partial \theta}$$
+      - $$I\dot{\omega} = -\nu \omega + gr\int_0^{2\pi} m(\theta, t)\sin\theta\ d\theta$$
+    - Fourier transform:
+      - As theta is cyclic and Q is even-symmetric (due to the shape of the manifold), we have (at some t):
+        - $$m(\theta) = \sum_n a_n \cos n\theta + \sum_n b_n \sin n\theta$$
+        - $$Q(\theta) = \sum_n q_n \cos n\theta$$
+      - Compare the coefficients of sin and cos in both sides:
+        - $$\dot{a_n} = n\omega b_n - K a_n$$
+        - $$\dot{b_n} = -n\omega a_n + q_n - Kb_n$$
+        - $$I\dot{\omega} = -\nu\omega + \pi gra_1$$
+      - n = 1 is decoupled from everything else (higher n's are only 2D systems given the dynamics of omega):
+        - $$\dot{a} = \omega b - K a$$
+        - $$\dot{b} = -\omega a + q - Kb$$
+        - $$\dot{\omega} = -\frac{\nu}{I}\omega + \frac{\pi gr}{I}a$$
+      - An example of the Lorenz system
+  - Fixed points:
+    - $$\omega = 0$$: no rotation
+    - $$b = K\nu/\pi gr$$: static rotation if $$\frac{\pi grq}{K^2\nu} $$, the "Rayleigh number" (in fluid dynamics), is larger than 1
+  
+- Lorenz equations:
+
+  - Derived from simple model of convection (对流), but also exists in other fields
+  - First system with a chaotic attractor (not the first one with chaotic behaviour - Poincare's three body system is the first one, where the chaos is transient rather than self-sustaining)
+  - Dynamics:
+    - $$\dot{x} = \sigma(y - x)$$
+    - $$\dot{y} = rx - y - xz$$
+    - $$\dot{z} = xy - bz$$
+    - $$\sigma, r, b > 0$$ are tha parameters, where r is the Rayleigh number that can be adjusted (the other two are often fixed $$\sigma = 10, b = 8/3$$)
+  - Simple properties:
+    - Symmetric under (x,y) -> (-x,-y)
+    - "Dissipative" in the sense that volumes in phase space contract under the flow (i.e. the volume of a set of phases will shrink as they evolve along the trajectories, unlike Liouville theorem in Hamilton systems)
+      - $$\dot{V} = \iint_{\partial V} \vec{u}\cdot \vec{n}\ dA = \iiint_V \nabla\cdot\vec{u}\ dV$$ (for any dynamic system)
+      - u is the phase velocity, n is the normal vector, A is a small patch
+      - For Lorenz system, it turns out that $$\dot{V} = -(\sigma + b + 1) < 0$$, so the volumn is shrinking exponentially
+      - Therefore, every trajectories converge to (theoretically possibly) a point, a cycle, a surface, or a strange attractor
+  - Fixed points:
+    - (0, 0, 0) regardless of r
+      - r > 1: 2D in and 1D out
+      - r < 1: stable
+        - actually globally stable (i.e. every trajectory approaches origin)
+        - proved by defining a function $$V = \frac{1}{\sigma^2}x^2 + y^2 + z^2$$, which turn out to approach 0 as time goes to infinity
+        - Such function that keeps decreasing along the trajectory is called Lyapunov function
+    - $$x,y = \pm\sqrt{b(r-1)}, z = r-1$$
+      - supercritical pichfork bifurcation at r = 1
+      - subcritical Hopf bifurcation at $$r = \sigma(\frac{\sigma + b + 3}{\sigma - b- 1})\approx 24.74$$ (note that origin is also unstable at this time)
+        - but the trajectories jump to another attractor (actually a strange attractor), not a stable limit cycle
+  
+- Chaos:
+
+  - Two points with very close initial position will diverge exponentially as time increases
+    - Note: not a perfect exponential function
+    - And not always increasing given enough time (e.g. for a strange attrator there will be a limit for the distance between two points)
+  - $$\delta(t) \approx \delta_0e^{\lambda t}$$ (before saturation)
+    - $$\lambda$$ is called the Lyapunov exponent, which is about 0.9 in Lorenz's default setting
+      - In n dimensional system, there will be n Lyapunov exponents for each axes of the ellipsoid evolved from a small sphere around the initial condition, but in most cases we refer to the largest one
+      - Besides, you should average over many points on the trajectory to estimate $$\lambda$$
+    - A positive Lyapunov exponent is the signature of chaos
+    - *Predictability horizon* (also called Lyapunov time horizon) represents how long we can reliably predict the system
+      - Given tolerance a, $$t \sim O( \frac{1}{\lambda}\ln\frac{a}{||\delta_0||})$$
+
+  - Some stories about chaos:
+    - Lorenz made up such a system in order to simulate weather-like (deterministic but unpredictable) dynamics to compare two methods in weather forecasting
+    - The predictability horizon of weather forecasting is about ten days
+    - The solar system is also a chaotic system, with a time scale ($$\frac{1}{\lambda}$$) of millions of years
+  - Semi-formal "definitions" of chaos:
+    - Aperiodic long term behaviour
+    - Deterministic system
+    - Sensitive dependence of initial conditions (positive Lyapunov exponent)
+
+## Strange Attractor
+
+- Semi-formal "definitions":
+  - Attractor:
+    - A is an invariant set (start in A, stay in A)
+    - The basin of attraction for A is an open set
+    - No proper subset of A suffices the above requirements
+    - (Some researchers suggest that) if a trajectory begins in a neighbourhood of A, it will stay in another heighbourhood of A from then on
+  - Strange attrator:
+    - One definition: an attrator that exhibits sensitive dependence of initial conditions
+    - Another definition: an attractor with fractal local structure
+
+- Dynamics on the strange attractor as an 1D map:
+
+  - Main question: is Lorenz attrator only a super complex limit cycle?
+
+  - The dot is "spiraling" around one fixed point and then goes to the other and begins spiraling again
+
+  - The maximum distance during the first spiral influences where the next spiral begins
+
+  - Therefore, we can explore the map from a local maximum of Z coordinate to the next local maximum (note: it will be ocillating during spiraling) 
+
+    - Simulation shows that the scatter dot of (maximum_1, maximum_2) really looks like the figure of a function
+    - In fact, it is not a single-value function, but we can assume that it is
+
+  - $$z_n = f(z_{n-1})$$
+
+    <img src = "11-1.png" style = "zoom:40%"/>
+
+  - There is one "fixed point" in this "function", which correspondes to a $$\infin$$ shape limit cycle
+
+    - Drawing a "Cobweb diagram" on the graph (iterating with a starting point close to the fixed point) will show that the limit cycle is not stable (since the slope is larger than 1)
+    - Can there be periodic pattern in $$\{z_n\}$$?
+
+  - *z* is a point of period *p* if *p* is the smallest possible integer so that $$f^p(z) = \underbrace{f(f(f(\dots f}_{p}(z)\dots))) = z$$
+
+    - If there is a limit cycle, then there should be a periodic pattern in $$\{z_n\}$$
+    - The stability of *z* is determined by the slope of $$[f^{p}]'(z)$$
+    - $$|[f^2]'(z)| = |f'(f(z))||f'(z)| \ge 1$$, similarly for other value of *p*
+
+  - Therefore, there is no stable limit cycle in Lorenz attrator
+
