@@ -32,6 +32,13 @@ How to install python 2.7 (32 bit) and python 3.7 (64 bit) simultaneously on a 6
 
    Enter `regedit`, go to `HKEY_CURRENT_USER\Software\Python\PythonCore`, create a new folder `2.7` in the style of the original one (`3.7`), changing all directory prefix to `ANACONDAPTH\envs\YOURENVNAME`.
 
+**Rolling back to a previous installation state:**
+
+```bash
+conda list --revisions
+conda install --revision [revision number that you want to go back to (including it)]
+```
+
 
 
 ## Jupyter Notebook
@@ -50,50 +57,88 @@ How to install python 2.7 (32 bit) and python 3.7 (64 bit) simultaneously on a 6
 
 ## Python
 
-- For Python 2 only: `/` is the same as the `/` in C, different from that in matlab or python 3.
+- For Python 2 only: `/` is the same as the `/` in C, or `//` in Python 3
 
 
 
 ## Numpy
 
 - See https://numpy.org/doc/stable/user/numpy-for-matlab-users.html for the difference between numpy and matlab.
+
 - Most important differences:
-  - Arrays are passed **by reference**, including all regular **indexing**, which only creates views
+  - Arrays are passed **by reference**, including all **basic indexing**, which only creates views
     - Use `Y = X.copy()` for deep copy
-    - `ix_()` generates deep copy
+    - Only advanced indexing (list, logical, `.ix_()`, array) generates deep copy
   - Arithmatic operations are **element-wise**, though `@` represents matrix multiplication ('element-wise' is just like that in matlab)
     - But `dot()` conducts matrix multiplication if both inputs are matrices!
   - `np.std()` and `np.var()` are normalized by **n** rather than **n - 1** in Matlab
   - **Zero-based, row-first** indexing
-    - For example, 2D numpy array is actually a list of rows
-    - So `x.flatten()` generates a vector in **row-first** way, while `x.flatten('F')` is in column-first way just as in Matlab
+    - An *N*-dimensional numpy array of size $$(n_1, \dots, n_N)$$ is actually a list containing $$n_1$$ *(N-1)*-dimensional arrays, and a 0-dimensional array is just a normal list
+    - So `x.flatten()` generates a vector in **last-dimension-first (row-first)** way, while `x.flatten('F')` is in column-first way just as in Matlab
     - Some functions are also different, e.g. `numpy.corrcoef()` treats each row as an variable by default while Matlab always treats each row as an observation
-  - When you extract a column from a matrix by indexing, it will become a **1D vector**, and by default viewed as a **row vector**
-    - But `np.ix_()` will generate the expected output, i.e. a column vector
+  
+  - When indiced by **a single integer *i*** (not `i:i+1`), this dimension (even if it is in the middle position) will be removed, unlike matlab
+    - e.g. `arr = np.zero([2, 3, 4])`, then `arr[:, 0, :].shape` will be `(2, 4)`
   - A silly difference:
     - `np.round()` (or `np.floor()`, `np.ceil()`) returns a **numpy.float64** object (more exactly, the same type as the input) which cannot be used directly as an index
     - More silly difference: `round(np.array(0))` also returns a **numpy.float64** object!
-    - The workaround is to use `array.astype('int')`, which converts each element to int (and preserves the shape)
+    - The workaround is to use `array.astype('int')`, which converts each element to int (round-towards-zero like `//`, and preserves the shape)
+  
 - Size:
   - `size()` is the same as `numel()` in matlab, `arr.shape()` is the same as `size(arr)` in matlab
-  - Normal one-dimensional Python lists and 1D numpy arrays are **row vectors** by default, but can be implicitly transposed to column vectors (but numpy arrays have fixed shape)
+  - Normal one-dimensional Python lists and 1D numpy arrays are **row vectors** by default, but matlab arrays have fixed shape
     - e.g., if you multiply an 1D array of size `(n,)` with a column vecor of size `(n, 1)`, the result is an **n * n** matrix rather than a vector
-  - Just like Matlab, Numpy will add or remove the trailing singular dimension automatically, but unlike Matlab, it will be removed only after operation rather than immediately after your declaration.
-- Indicing:
-  - Sequential indicing:
-    - Python uses zero-based indicing and the second argument in the `::` command means the position after the end
+    - e.g., an array of size `(2, 3)` can be added up with an array of size `(3,)` but not `(2,)`
+    - You will get an **1D** array when extracting a column using a single integer
+  - Just like Matlab, Numpy will add or remove the trailing singular dimension automatically
+    - But unlike Matlab, it will be removed only after operation rather than immediately after your declaration.
+  
+- Indexing:
+  - Basic Indexing:
+    - Python uses zero-based Indexing and the second argument in the `::` command means the position after the end
+      - e.g., getting 40 trials for each subject *i*: `arr[i * 40:(i + 1) * 40, :]`
     - `arr[a-1:b:step, ...]` equals to `arr(a:step:b, :, :)` in matlab (maybe more `, :`) if `step` is positive, and `arr(a:step:b+2, :, :)` if `step` is negative
-  - Vector or logical indicing:
-    - `arr[np.ix_(vec1, vec2)]` equals to `arr(vec1, vec2)` in matlab
-    - **Do not** mix up `ix_()` with regular indicing
-- Vectorization:
-  - Numpy operations are vectorized in a similar way as Matlab's element-wise operation (that is, arrays must be in "compatible size")
+      - if you need to index a dimension reversely to the beginning (including), it's like: `arr[a::-1, :]`
+    - You can add a `None,` (or `np.newaxis,`) to where you want in order to add a singular dimension
+      - e.g. `arr = np.zero([2, 3, 4])`, then `arr[..., None, :].shape` will be `(2, 3, 1, 4)`
+    - When indiced by **a single integer *i***, this dimension (even if it is in the middle position) will be removed
+      - e.g., you will get an **1D** array (row vector) instead of a column by `arr[:, i]`
+      - But indexing by `i:i+1` can work around it
+    
+  - Advanced Indexing:
+    
+    - You can use list or logical indexing just like matlab, iff in **ONLY ONE DIMENSION**
+    
+      - Besides, `[aList]` is the same as `[aList, ...]`
+    
+    - For list or logical slicing over more than one dimension, you must use `arr[np.ix_(list1, list2, ... listN)]` in **ALL DIMENSION**
+    
+      - Each list must be **1D**, i.e., for position *i* you need `[i]`, and you can't use column vector
+      - You should **NEVER** mix up `np.ix_()` with any other kind of indexing!
+    
+    - You use ndarrays with compatible size in every position for indexing, in order to extract scattering elements in the array:
+    
+      ```python
+      result[i_1, ..., i_M] == x[ind_1[i_1, ..., i_M], ind_2[i_1, ..., i_M],
+                                 ..., ind_N[i_1, ..., i_M]]
+      ```
+    
+      for all `i_k` in `range(n_k)`, where all indexing arrays can be broadcast to size `[n_1, ..., n_M]`.
+    
+      - In Matlab you can do similar things (but no broadcasting, all arrays must have same size) by `sub2ind()`
+  
+- Broadcasting:
+  
+  - Numpy operations are broadcast in a similar way as Matlab's element-wise operation (that is, arrays must be in "compatible size")
+  
 - Others:
   - You can use `+=` in python
   - You must close a file opened by `np.load('xxx.npz')` after extracting the data (but for `.npy` file the return value is a single array)
   - Somtimes `np.load('xxx.npy')` may return something like `tmp1 = array({'a', va, 'b', vb, ...}, dtype=object)`, which is an 0-dimensional array containing a dict. In order to get the contain, you have to use `tmp = tmp1[()]` or `tmp = tmp1.item()`
   - There's no `find()` in numpy, but you can use `nonzero()`. 
     - **CAUTION**: `np.nonzero()` returns a tuple of arrays, each containing the indices of none-zero elements in corresponding dimension!
+    - Besides, you can use `argmax()` to get the index of the first occurrence of largest item.
+  - Matlab functions usually operate on the first dimension by default, but numpy's usually work on the whole array by default (e.g. `min`, `std`)
 
 
 
@@ -112,3 +157,76 @@ How to install python 2.7 (32 bit) and python 3.7 (64 bit) simultaneously on a 6
 - `cv2.imshow()` will only show image after execution of `cv2.waitKey()`, similarly `plt.imshow()` or other matplotlib functions will only show image after `plt.show()`.
 - `cv2.HOUGH_GRADIENT` is called `cv2.cv.CV_HOUGH_GRADIENT` in the old version.
 
+
+
+## PyTorch
+
+- Torch tensor: a replacement of Numpy array
+  - `torch.xxx` instead of `np.xxx`, e.g. `rand(), zero()`
+  - `torch.tensor()` instead of `np.array()`
+    - Note: for both one, passing `[1., 2.]` to prevent implicit conversion into integer
+    - In old version, only `torch.variable()` instead of `torch.tensor()` can be used in autograd, but now the former has been removed
+  - `torch.from_numpy()` transform a numpy array to torch tensor
+  - some simple operations are defined as methods, e.g. `.sigmoid().pow(2).sum()`
+  - some slight differences, e.g. parameter order in `meshgrid()`
+  
+- Autograd: tensors will automatically track their computational history (by links `.grad_fn()` to the caller functions) if `.requires_grad() = True`
+  - **requires_grad**:
+    - Self-created tensors have a default value of **False**
+    - Parameters in network modules have a default value of True
+    
+  - You can freeze a part in the network by:
+    
+    ```python
+    for param in model.parameters():
+        if (param is in this part):
+            param.requires_grad = False
+    ```
+    
+  - You can propagate the gradient to the `.grad` field of respective tensors by `.backward()`
+    
+    - e.g., `x = torch.tensor(2.); y = x ** 2`, then `y.backward()` will make `x.grad = 4.`
+    
+  - The gradient is computed each time `.backward()` is called, so the computational graph is recreated every time
+    - Therefore, theoretically you can change the network structure in every iteration, using commands like `while(), if()` in python
+    - However, in Tensorflow 1.0, the whole graph must be defined statically and compiled before real computation by commands like `tf.while_loop()`
+    - Torch tensors contain real data while Tensorflow uses placeholders.
+    - That's why we say PyTorch supports dynamic computational graph while Tensorflow cannot.
+  
+- Using GPU:
+  - `device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')`
+  - Store data in GPU:
+    - `x = torch.tensor([1, 2, 3], device=device)` or
+    - `x = torch.tensor([1, 2, 3]).to(device)`
+  - Store model in GPU: `net.to(device)` (no reassignment required)
+  
+- Define and train a network: see [Pytorch_Basis.ipynb](Pytorch_Basis.ipynb)
+
+  - A key feature in Pytorch is the *module*, which encapsulate computational units like layers and networks.
+
+  - A module is defined as a subclass of `nn.module`, which has a `.__init__(self)` method (of course) and a `.forward(self, x)` method:
+    - In `.__init__`, you initialize the module and define the trainable modules/parameters
+      
+      - The immediate submodules can be shown by generators `.children()` or `.named_children()`, and all submodules can be shown recursively by `.modules()` or `.named_modules()`
+    - All parameters can be shown by `.parameters()` or `.named_parameters()`
+      - You can use modules dynamically with the help of `.ModuleList()` or `.ModuleDict()`
+    - In `.forward()`, you define the computational flow of the module
+  - To train a network:
+
+    - Register the parameters into an optimizer
+
+    - Repeat the following:
+
+      - Feed one sample into the network
+
+      - Calculate the loss
+
+      - Clear current gradient, then BP
+      
+      - Update the optimizer state (i.e. the parameters)
+
+- A concrete example: see http://pytorch.panchuang.net/ThirdSection/LearningPyTorch/
+
+- Some functions:
+  
+  - `.repeat_interleave()` is similar to `np.repeat()` and different from `.repeat()`, where each element (instead of the whole pattern) is repeated
