@@ -20,7 +20,7 @@
   - Explanation:
     - The extent to which the point behaves like a source: sink if negative, no flux if zero, source if positive
   - Calculation: 
-    - $$\nabla\cdot \bold{F} = (\frac{\partial}{\partial x_1}, \frac{\partial}{\partial x_2}, \dots, \frac{\partial}{\partial x_n}) \cdot \bold{F} = (\frac{\partial F_{x_1}}{\partial x_1}, \frac{\partial F_{x_2}}{\partial x_2}, \dots, \frac{\partial F_{x_n}}{\partial x_n})$$
+    - $$\nabla\cdot \bold{F} = (\frac{\partial}{\partial x_1}, \frac{\partial}{\partial x_2}, \dots, \frac{\partial}{\partial x_n}) \cdot \bold{F} = \sum_{j = 1}^{n}\frac{\partial F_{x_j}}{\partial x_j}$$
 - Laplacian:
   - Definition: 
     - the Laplacian of a scalar function is the divergence of its gradient field
