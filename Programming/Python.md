@@ -39,6 +39,18 @@ conda list --revisions
 conda install --revision [revision number that you want to go back to (including it)]
 ```
 
+**Using VS Code with conda:**
+
+- The main problem is that the command `conda` is not recognized in the shell unless you are in the user folder (`C:\Users\YOURNAME`), so you cannot activate the environment in your workspace.
+- One solution: Open "Anaconda Prompt (ENVIRONMENT)" from startup menu everytime, then type `code` to open VS Code with the conda environment set up
+- Another solution: following this [answer](https://stackoverflow.com/a/58211115) and add `conda` commands into system path
+  - You may receive an error when you finish that and repoen powershell: `Unable to load C:\Users\...\WindowsPowerShell\profile.ps1, because running scripts is disabled on this system `
+  - If so, you will need to change the execution policy for your powershell by:
+    - Open powershell as administrator
+    - Execute the command `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned`
+    - Reopen all shells
+    - Note: this may have some negative influences, see http://go.microsoft.com/fwlink/?LinkID=135170 for explanation
+
 
 
 ## Jupyter Notebook
@@ -148,13 +160,16 @@ conda install --revision [revision number that you want to go back to (including
   - Numpy operations are broadcast in a similar way as Matlab's element-wise operation (that is, arrays must be in "compatible size")
   
 - Others:
+  - Matlab functions usually operate on the first dimension by default, but numpy's usually work on the whole array by default (e.g. `min`, `std`)
   - You can use `+=` in python
   - You must close a file opened by `np.load('xxx.npz')` after extracting the data (but for `.npy` file the return value is a single array)
   - Somtimes `np.load('xxx.npy')` may return something like `tmp1 = array({'a', va, 'b', vb, ...}, dtype=object)`, which is an 0-dimensional array containing a dict. In order to get the contain, you have to use `tmp = tmp1[()]` or `tmp = tmp1.item()`
+  - `dot(a, b)` doesn **NOT** always compute dot product
+    - e.g, it is matrix multiplication if `a, b` are 2D
+    - and it does **NOT** has a parameter for dimension
   - There's no `find()` in numpy, but you can use `nonzero()`. 
     - **CAUTION**: `np.nonzero()` returns a tuple of arrays, each containing the indices of none-zero elements in corresponding dimension!
     - Besides, you can use `argmax()` to get the index of the first occurrence of largest item (but you cannot do so by `max()`)
-  - Matlab functions usually operate on the first dimension by default, but numpy's usually work on the whole array by default (e.g. `min`, `std`)
 
 
 
