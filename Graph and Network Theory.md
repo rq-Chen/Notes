@@ -1,6 +1,6 @@
 # Graph and Network Theory
 
-## Network Discriptors
+## Network Descriptors
 
 - Node degree and degree distribution
 - Degree correlations (assortativity):
@@ -35,6 +35,12 @@
   - Modules can be found by hierarchical clustering
   - Provincial hubs: mainly connecting with the nodes in the module
   - Connector hubs: connecting with nodes in different module
+- Topological description: See [Kathryn Hess's paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5467434/)
+  - Simplex (单纯型): a generalization of the notion of a triangle or tetrahedron to arbitrary dimensions (the simplest possible polytope in any given space).
+  - Directed cliques: a clique (团) containing a single source neuron and a single sink neuron, reflecting a specific *motif* of connectivity
+    - directed cliques of n neurons is essentially directed simplices of dimension n-1
+  - Cavity: a polytope formed by directed cliques binding appropriately by sharing vertices, and without forming a larger clique due to missing connections
+    - e.g. an octahedron, a hexagonal bipiramid
 
 
 

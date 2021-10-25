@@ -94,7 +94,7 @@ conda install --revision [revision number that you want to go back to (including
 - See https://numpy.org/doc/stable/user/numpy-for-matlab-users.html for the difference between numpy and matlab.
 
 - Most important differences:
-  - Arrays are passed **by reference**, including all **basic indexing**, which only creates views
+  - Arrays are passed **by reference**, including all **basic indexing**, which only creates views (unless you assign it to itself)
     - Use `Y = X.copy()` for deep copy
     - Only advanced indexing (list, logical, `.ix_()`, array) generates deep copy
   - Arithmatic operations are **element-wise**, though `@` represents matrix multiplication ('element-wise' is just like that in matlab)
@@ -158,6 +158,11 @@ conda install --revision [revision number that you want to go back to (including
 - Broadcasting:
   
   - Numpy operations are broadcast in a similar way as Matlab's element-wise operation (that is, arrays must be in "compatible size")
+  - Matrix multiplication (`@` or `matmul()`):
+    - If both arguments are 2-D they are multiplied like conventional matrices.
+    - If either argument is N-D, N > 2, it is treated as a stack of matrices residing in the last two indexes and broadcast accordingly.
+    - If the first argument is 1-D, it is promoted to a matrix by prepending a 1 to its dimensions. After matrix multiplication the prepended 1 is removed.
+    - If the second argument is 1-D, it is promoted to a matrix by appending a 1 to its dimensions. After matrix multiplication the appended 1 is removed.
   
 - Others:
   - Matlab functions usually operate on the first dimension by default, but numpy's usually work on the whole array by default (e.g. `min`, `std`)
@@ -170,6 +175,15 @@ conda install --revision [revision number that you want to go back to (including
   - There's no `find()` in numpy, but you can use `nonzero()`. 
     - **CAUTION**: `np.nonzero()` returns a tuple of arrays, each containing the indices of none-zero elements in corresponding dimension!
     - Besides, you can use `argmax()` to get the index of the first occurrence of largest item (but you cannot do so by `max()`)
+  
+- Saving data into `.mat` files:
+
+  - `scipy.io.savemat(filename, myDict)`
+    - `myDict` is a dictionary, usually the keys being variable names and values being variables.
+    - The output file contains the values in `myDict` as variables with the keys as names.
+  - String variables will be converted to strings, numbers to numbers, dictionary to structure
+  - If you want to save a list containing different types of data, you need to transform it by `np.array(myList, dtype=np.object)`, which will be converted into a 1 * n cell
+  - If you want to save a list containing all strings, you also need to transform it into numpy ndarray by the same way above, otherwise it will be converted into a char matrix with spaces padding all strings to the same length
 
 
 
@@ -178,6 +192,8 @@ conda install --revision [revision number that you want to go back to (including
 - `plt.clim(a, b)`, not `clim([a, b])`
 - `plt.subplot()` cannot combine several small subplots like matlab
   - But you can use `plt.subplot2grid(size, loc, rowspan, colspan)`
+- `plt.axvline(x=0, ymin=0, ymax=1,  **kwargs)` can plot a vertical line on the plot (`ymin` and `ymax` are proportion between 0 (bottom) and 1 (top)
+  - Similar functions: `axhline` for horizontal lines, `axline` for lines with arbitary slope
 
 
 
@@ -207,7 +223,7 @@ conda install --revision [revision number that you want to go back to (including
   - some simple operations are defined as methods, e.g. `.sigmoid().pow(2).sum()`
   - some slight differences, e.g. parameter order in `meshgrid()`
   - `torch.max()` can return index along with maximum value if you set the parameter `dim=`
-  
+
 - Autograd: tensors will automatically track their computational history (by links `.grad_fn()` to the caller functions) if `.requires_grad() = True`
   - **requires_grad**:
     - Self-created tensors have a default value of **False**
@@ -237,10 +253,13 @@ conda install --revision [revision number that you want to go back to (including
     - `x = torch.tensor([1, 2, 3], device=device)` or
     - `x = torch.tensor([1, 2, 3]).to(device)`
   - Store model in GPU: `net.to(device)` (no reassignment required)
+    - Note: this command ONLY move the `net.parameters()` and `net.buffers()` to GPU.
+    - If you need to use some untrained tensors (e.g., random noise) in you model and you want it to be on GPU, you need to register them by `register_buffer()`
+    - But if they are the calculation results of some GPU tensors, they will be automatically on GPU (see below)
   - Usually, you don't need to specify the device in the definition of a module if you make sure all inputs are on the same device:
     - e.g. when transfering a list of tensors (maybe of differnt shape so that you cannot convert the list into a larger one) to GPU, you may need to use `[curr.to('cuda') for curr in listTensor]`
     - if the outputs are generated by the processing of input through a series of PyTorch modules, than the output will be on the same device of the input
-      - but if you do other operation involving **a tensor** on another device (so using a number will be OK), e.g. adding a constant offset vector manually, than that will be a problem
+      - but if you do other operation involving **a tensor** on another device (using a number will be OK), e.g. adding a constant offset vector manually, then that will be a problem
     - however, the output of self-defined methods without GPU input (e.g. `initialize_hidden()`) is on CPU by default
   
 - Define and train a network: see [Pytorch_Basis.ipynb](Pytorch_Basis.ipynb)
@@ -276,6 +295,7 @@ conda install --revision [revision number that you want to go back to (including
 - Some functions:
   
   - `.repeat_interleave()` is similar to `np.repeat()` and different from `.repeat()`, where each element (instead of the whole pattern) is repeated
+  - `nn.Linear` is implemented as $$y = xA^\top + b$$, the weight matrix A (`.weight`) is of shape `(N_out, N_in)`!
 
 
 
