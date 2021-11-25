@@ -649,8 +649,8 @@ According to *Linear System Theory and Design* by Chi-Tsong Chen, and [Wikipedia
 
     - for any $$t > 0$$, $$W_c(t)$$ is nonsingular
     - the matrix $$\begin{bmatrix} A - \lambda I & B\end{bmatrix}$$ has full row rank for every eigenvalue $$\lambda$$ of $$A$$
-    - the *controllability matrix* $$\begin{bmatrix}B & AB & A^2B & \dots & A^{n-1}B\end{bmatrix}$$ has full row rank
-      - a state $$x_f$$ can not be reached from some states within finite time if $$x_f$$ is not in the range space of the controllability matrix, thus said to be incontrollable
+    - the *controllability matrix* $$\begin{bmatrix}B & AB & A^2B & \dots & A^{n-1}B\end{bmatrix}$$ has full row rank ($$n$$)
+      - a state $$x_f$$ can not be reached from some states within finite time if $$x_f$$ is not in the range space of the controllability matrix, thus said to be uncontrollable
       - if all uncontrollable states have stable dynamics, then the system is *stablizable*, though not controllable
   - An LTI system with stable $$A$$ is controllable if and only if $$W_c$$ is nonsingular.
 
@@ -670,6 +670,7 @@ According to *Linear System Theory and Design* by Chi-Tsong Chen, and [Wikipedia
       - eigenvectors with huge eigenvalues may be rarely visited and can serve as a target for dimensionality reduction
     - We can define an ellipsoid containing the states that can be reached within unit energy:
       - $$E_c = \{\Psi_cu: ||u||_{L_2} \le 1\} = \{\xi\in \R^n: \xi^\top W_c^{-1}\xi \le 1\}$$
-      - The semiaxes of the ellipsoid are $$\{\sqrt{\lambda_i}v_i\}$$, where $$\lambda_i, v_i$$ are the i-th eigenvalue and unit eigenvector of $$\mathbf{W_c}$$ (not its inverse!)
+      - The semiaxes of the ellipsoid are $$\{\sqrt{\lambda_i}v_i\}$$, where $$\lambda_i, v_i$$ are the i-th eigenvalue and unit eigenvector of $$\mathbf{W_c}$$ (not the inverse)
+        - Note that if $$v_i$$ is an eigenvector of an invertable matrix $$A$$ with eigenvalue $$\lambda_i$$, then it is also an eigenvector of $$A^{-1}$$ with eigenvalue $$1/\lambda_i$$
       - Therefore, the directions with large eigenvalue are strongly controllable (reachable); those with small eigenvalue are weakly controllable (reachable)
 

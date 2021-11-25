@@ -49,7 +49,23 @@ For example, the most important contribution of this paper is that it shows how 
 **Echo-state Property**
 
 - Roughly speaking, the ESP is a condition of asymptotic state convergence of the reservoir network, under the influence of driving input.
+
 - A network $$F:X\times U \to X$$ (with the compactness condition) has the echo state property with respect to $$U$$: if for any left infinite input sequence $$u^{-\infin}\in U^{-\infin}$$ and any two state vector sequences $$x^{-\infin}_a, x_b^{-\infin}$$ that are both compatible with $$u^{-\infin}$$, it holds that $$x_a[0] = x_b[0]$$.
+
+- In other words, there exists an "echo function" $$E$$ so that $$x[n] = E(\dots, u[n-1], u[n])$$, meaning that the network state is determined only by the input rather than initialization after enough time.
+
+  - In fact, echo-state networks has "state-forgetiveness" and "input-forgetiveness", meaning that both the previous states and inputs will not influence the following states after enough time.
+
+  - The presence of echo function allows the training of output weights to be considered as a simple linear regression minimizing the norm of this loss:
+    $$
+    \epsilon[n] = (f^{out})^{-1}y_{teach}[n] - \sum_{i = 1, 2, \dots, n}w_ie_i(\dots, u[n-1], u[n])
+    $$
+    where $$f^{out}$$ is the output activation and $$e_i$$ is the echo function for hidden neuron i, $$y_{teach}$$ is the expected output.
+
+- Therefore, in order to get a better estimation of weights $$w_i$$, we want the independent variables $$e_i$$ to have a wide range.
+
+  - Therefore, the network should provide a rich **"reservoir"** of dynamics to be "tapped" by the output weights.
+  - This is achieved by using sparse and random connection, which keeps the subnetworks relatively decoupled.
 
 **Conditions for Echo-state Property**
 
