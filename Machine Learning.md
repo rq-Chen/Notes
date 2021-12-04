@@ -242,3 +242,10 @@
   - trained on 4.9TB of images and text, including 1.2TB of Chinese text
   - incorporates multiple models including language models, image captioning models, and protein folding prediction models
   - outperform SOTA in 9 language modeling, image classification and image captioning tasks
+
+## GAN
+
+## VAE
+
+## Self-supervision
+
