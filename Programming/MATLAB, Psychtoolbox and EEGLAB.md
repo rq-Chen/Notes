@@ -6,6 +6,10 @@
 - `subplot()` can actually create subplots with different size, e.g. try `subplot(2, 3, [2 6])`
 - Outputs of `meshgird()` and `ndgrid()` are in different order:
   - `ndgrid()` follows the indexing order of MATLAB (first dimension first), while `meshgrid()` is in Y-then-X-then-Z order (more suitable for 2D grid)
+- You can plot a line with gradient color! See https://undocumentedmatlab.com/articles/plot-line-transparency-and-color-gradient
+  - Note: you must call `drawnow` before accessing the `.Edge.ColorData` property, and call `drawnow` again to show the change after modifying it
+  - Besides, the transparency in `.Edge.ColorData` will be ignored, but you can convert RGBA to RGB by a linear interpolation with the background color (e.g. `(255, 255, 255)`).
+  - What's more, you need to modify `.ColorData` and `.ColorBinding` in a single `set` command.
 
 ## PTB
 

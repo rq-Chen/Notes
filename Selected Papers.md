@@ -77,3 +77,33 @@ For example, the most important contribution of this paper is that it shows how 
   2. Scale $$W$$ to make $$\rho(W)$$ (for standard model) or $$\rho(\tilde W)$$ (for leaky model) slightly smaller than 1
   3. Change the signs of a desired number of connections to negative (e.g., half of positive ones)
 
+## The Quest of Consciousness
+
+Christof Koch, 2004
+
+### Chapter 5: What is the NCC? 
+
+- NCC_e are the enabling factors for consciousness while NCC creates the contents of consciousness
+  - Former: brainstem activation system  (especially ach), intralaminar nuclei (ILN) in thalamus (no stimulus encoding; damage to which makes 'zombies' like Karen Ann Quinlan)
+
+  - Latter: Content providers; information compete with each other to enter NCC and become awared.
+
+- GWT for NCC while IIT for NCC_e?
+
+- Can you be conscious without any imaginative, sensory, linguistic, or mnemonic contents? (Maybe meditation?) Are they coming into your consciousness right after open your eyes? 
+
+- Can we be sure that NCC_e does not provide any contents (e.g., the feeling of "being")?
+
+- Function of a protein emerges from its whole 3D structure. However, only some amino acids are most important, which may be the same for consciousness. 
+
+### Chapter 6: V1 is not part of NCC
+
+- V1 neuron can adapt to stimulus even if you cannot see it, so "seeing" happens above V1 (from a not holistic  perspective) 
+- V1 neuron is influenced by features that are not perceived, e.g. eye-of-origin, local binocular disparity, blinking and eye movement. 
+- Requirements for NCC includes perceptual stability (really necessary?)
+
+### Chapter 7: Beyond V1
+
+- Neural connections can be roughly classified into driving (strong) or modulating (weak) connections. 
+- No strong loop was found in thalamus and the cortex, and hypothetically will never be found. 
+- Thalamal projection to the cortex can be classified into "core" connections (ending in the intermediate layers of a very specific area) and "matrix" connections (ending in the shallow layers of a wide range of area) 
