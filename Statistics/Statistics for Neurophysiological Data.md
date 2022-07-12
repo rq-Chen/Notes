@@ -29,7 +29,7 @@ In case of the multiple comparison problem (MCP), the above method will generate
 
 There are several ways to acheive this goal.
 
-#### Using group statistics
+#### Using group statistics (e.g. maximum T)
 
 The pipeline is modified as follows:
 
@@ -52,8 +52,11 @@ Constraints:
 - Divide $\alpha$ by *n* (the number of comparisons) so that totally there is still a chance of $\alpha$ for a single false positive outcome in all *n* tests.
   - Boole's inequality: $P\{\bigcup_{i = 1}^{n} A_i\} \le \sum_{i = 1}^n P\{A_i\}$
   - The probability of rejecting at least one true null hypothesis is no larger than the $\alpha/n * n = \alpha$
-
 - Bonferroni correction is the standard multiple test correction method, which provide strong control of FWER. However, in many cases it is too strict. Besides, it ignores the correlation in data (e.g. between consecutive timepoints), thus having very low statistical power.
+- How to report:
+  - For simplicity, the way to report Bonferroni-corrected results is usually to report a "corrected" p-value (instead of alpha), which is simply the original p-value multipled by the number of tests
+  - Note: if the "corrected" p-value is larger than 1 it will be set as 1
+
 
 ### False Discovery Rate (FDR):
 
@@ -82,7 +85,7 @@ Properties:
   - not true if the data contain both positive and negative wave, or channel dipoles, etc.
   - a version that is compatible with *negatively correlated data* is **Benjamini and Yekutieli (2001)** (as implemented in fieldtrip).
 
-## Permutation-based Approach
+## Permutation-based Approach (non-MCP)
 
 Actually the procedure is similar to the previous approach, except that it uses a model-free way to determine the threshold (critical value).
 
@@ -116,7 +119,16 @@ Detailed pipeline:
 
 ## Cluster-level Permutation
 
-The aforementioned method is only at the single point level and you can also perform the MCP correction by maximum T (strong restraint as Bonferroni, with moderate power between Bonfferoni and FDR), but in order to make better use of the structure of data, it's better to operate at a cluster level. You should choose a statistics that depends on every number in these $$D_{Ai}$$ or $$D_{Bi}$$ (namely a cluster-level statistics in time/frequency/space domain), e.g. the maximum area under the ERP wave within a suprathreshold period (here the threshold is defined by an uncorrect *t* statistics):
+- The aforementioned method is only at the single point level and you can also perform the MCP correction by maximum T
+  - strong control as Bonferroni
+  - moderate power between Bonfferoni and FDR
+- However, in order to make better use of the structure of data, it's better to focus on *clusters* rather than individual tests:
+  - sample-level: $P(\text{at least one }t > t_0 | H_0) = \alpha$, where $t$ is a statistics calculated from each test
+  - cluster-level: $P(\text{at least one ClusterStat} > \text{ClusterStat}_0 | H_0) = \alpha$, where $\text{ClusterStat}$ is a statistics calculated from each *cluster*
+  - clusters can be defined by thresholding
+  - $\text{ClusterStat}_0$ can be found by the distribution of  maximum ClusterStat (similar to the idea of maximum T)
+
+Here is an example, where the threshold is defined by an uncorrect *t* statistics:
 
 <img src = "Permutation test for ERF.png" style = "zoom:30%" />
 
@@ -124,13 +136,37 @@ A detailed pipeline:
 
 <img src = "Cluster level permutation test.png" style = "zoom:30%" />
 
+And we should add a final step: find the $(1 - \alpha) \times 100 \%$ percentile of the maximum cluster-level statistics as the threshold for "significant" clusters, and report the clusters in the observed data (not just the largest one!) with a cluster-level statistics larger than it.
+
 Note that if you have multiple conditions instead of one, you may need to use *F* statistics instead of *t*. In other words, every time you draw a set of sample, you do an ANOVA at eatch datapoint (time or time * freq * position, etc.) to get a curve of F statistics over time (or time * freq * location, etc.), then you threshold it by the 95 percentile of *F* (like an ANOVA for a single timepoint) and calculate the suprathreshold area. While in the two-condition case, you are essentially calculating the curve of *t* statistics over time (or time * freq * location, etc.).
 
 **(IMPORTANT)** how to interpret clusters:
 
-- If the cluster is defined *a priori* (time window, channel cluster, frequency range predefined), then it's reliably significant.
-- If the cluster is defined during the test (like the aforementioned example), maybe not. The only thing we can safely say is that the data is different among the conditions in somewhere at sometime for some frequency.
-- One confounding factor is that the cluster-level statistics may be more sensitive to some particular aspect or porportion of data, so that the "significant" cluster will be influenced. However this also means that you can define better statistics to test for specific aspect in the data.
+- For the whole dataset:
+
+  - The presence of any clusters that survive the test tells you that your data is different among conditions somewhere at some time in some frequency band
+  - Likewise, if you only do the cluster-based permutation tests in a proportion of your data, you can safely said the the data is different among conditions within this proportion (however, exactly when and where within this proportion is still unknown)
+
+- For clusters:
+
+  - A cluster that survives the test is NOT necessarily different among conditions.
+
+  - That's because the $H_0$ for permutation test is just that the data comes from a same distribution (under which assumption you can draw from resampling distribution just like uniform distribution, and get the distribution of whatever statistic you like - sample level or cluster level), it does NOT specify any time or space
+
+  - If we reject $H_0$, the only thing we can safely say is that the data is different among the conditions in somewhere at sometime for some frequency.
+
+  - One confounding factor is that the cluster-level statistics may be more sensitive to some particular aspect or porportion of data, so that the "significant" cluster will be influenced.
+
+    - If you test that the physical dimensions of male bodies are different from those of female bodies, you will likely find that the H0 (the physical dimensions of male and female bodies come from the same probability distribution) will be rejected in favour of the alternative (they come from different distributions).
+
+      However, from this result, one cannot conclude that men and women have different foot sizes. In fact, it may be that the test statistic that was used to compare male and female bodies was sensitive to other aspects than foot size.
+
+    - This also means that you can define better statistics to test for specific aspect in the data.
+
+- Besides, if a cluster is "significant", it does NOT mean that the data are significantly different at a certain timepoint within that cluster
+
+  - because the threshold is arbitary, and one timepoint may just be lucky that it lies in a cluster that contains a lot of "really" significant timepoints
+
 - See the [original paper](https://www.sciencedirect.com/science/article/pii/S0165027007001707?via%3Dihub) on this test, the [Fieldtrip suggestion](http://www.fieldtriptoolbox.org/faq/how_not_to_interpret_results_from_a_cluster-based_permutation_test/), and Steven Luck's suggestion (ERP book, [online chapter 13](https://erpinfo.org/s/Ch_13_Mass_Univariate_and_Permutations.pdf), the last section *Practical Considerations*)
 
 ### Threshold-Free Cluster Enhancement (TFCE)

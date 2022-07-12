@@ -275,7 +275,7 @@ Notes on *Nonlinear Dynamics and Chaos With Applications to Physics, Biology, Ch
   - Only exists in non-linear system (not in $$\dot{x} = Ax$$)
 - Criteria to rule out the possibility of closed orbits:
   - Dulac's criterion:
-    - R is a simply connected region in R^2, if there exists a continuous function g so that the sign of $$\nabla\cdot(g(X)X)$$ (divergence of X scaled by g(X), i.e. sum of each component of the gradient) does not change in R
+    - R is a simply connected region in R^2^, if there exists a continuous function g so that the sign of $$\nabla\cdot(g(X)X)$$ (divergence of X scaled by g(X), i.e. sum of each component of the gradient) does not change in R
     - But it's hard to guess g
 - Criteria for the existence of closed orbits:
   - Poincare-Bendixson theorem (only in 2D):
@@ -441,7 +441,7 @@ Notes on *Nonlinear Dynamics and Chaos With Applications to Physics, Biology, Ch
       - Define the moment of inertia (转动惯量) of the wheel as I(t), then the time derivative of angular momentum $$\dot{(\omega I)} = -\nu \omega + gr\int_0^{2\pi} m(\theta, t)\sin\theta\ d\theta$$
         - $$I = Mr^2 + I_{wheel}$$ will approach a constant as M becomes gradually static
         - $$I\dot{\omega} = -\nu \omega + gr\int_0^{2\pi} m(\theta, t)\sin\theta\ d\theta$$
-      - F is the torque (扭矩）due to gravity
+      - F is the torque (扭矩) due to gravity
         - the torque in sector $$d\theta$$: $$d\tau = dM\ gr \sin \theta$$, where $$g = g_0\sin\alpha$$ represents the acceleration "leftward" (in the top view) caused by gravity
       - $$\nu$$ represents both:
         - the effect that water comes in without angular momentum but comes out with a certain one
@@ -615,7 +615,8 @@ According to *Linear System Theory and Design* by Chi-Tsong Chen, and [Wikipedia
 
   - For a linear time-variant (LTV) system, let
     $$
-    W_c(t_0, t_1) = \int_{t_0}^{t_1} \Phi(t_1, \tau)B(\tau)B^\top(\tau)\Phi^\top(t_1, \tau)d\tau = \int_{t_0}^{t_1} e^{A(t_1 - \tau)}B(\tau)B^\top(\tau)e^{A^\top(t_1 - \tau)}d\tau
+    W_c(t_0, t_1) = \int_{t_0}^{t_1} \Phi(t_1, \tau)B(\tau)B^\top(\tau)\Phi^\top(t_1, \tau)d\tau \\
+    = \int_{t_0}^{t_1} e^{A(t_1 - \tau)}B(\tau)B^\top(\tau)e^{A^\top(t_1 - \tau)}d\tau
     $$
     
   - For an LTI system, let
@@ -673,4 +674,12 @@ According to *Linear System Theory and Design* by Chi-Tsong Chen, and [Wikipedia
       - The semiaxes of the ellipsoid are $$\{\sqrt{\lambda_i}v_i\}$$, where $$\lambda_i, v_i$$ are the i-th eigenvalue and unit eigenvector of $$\mathbf{W_c}$$ (not the inverse)
         - Note that if $$v_i$$ is an eigenvector of an invertable matrix $$A$$ with eigenvalue $$\lambda_i$$, then it is also an eigenvector of $$A^{-1}$$ with eigenvalue $$1/\lambda_i$$
       - Therefore, the directions with large eigenvalue are strongly controllable (reachable); those with small eigenvalue are weakly controllable (reachable)
+
+## Topological Dynamics
+
+### Topological Data Analysis
+
+
+
+## Ergodic Theory
 

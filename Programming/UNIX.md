@@ -26,7 +26,12 @@ Besides, you can clean the screen by `Ctrl + L`.
 | cat     | show file content / create new file / concatenate files      |
 | more    | show file content page by page (also see `less`)             |
 | head    | show the head of a file (also see `tail`)                    |
-| echo    | output a message to STDOUT; can used together with `>>` to write into files |
+| echo    | output a message to STDOUT; can used together with `>>` or `>` to write into files |
+
+Note:
+
+- You can use `head -n <LineIndex> <filename> | tail -n 1` to get a specific line in a file.
+- `>` overwrites existing content while `>>` appends to it.
 
 ### Search
 
@@ -77,6 +82,18 @@ From FSL:
   - Also see https://www.tecmint.com/chaining-operators-in-linux-with-practical-examples/
 
 - Line break: use back slash `\` to continue your command on a new line
+
+- tmux: allowing the client to leave a session running on the remote after logout; multi-session split window
+
+  - Install: `apt-get install tmux`
+  - Create a session (openning a tmux window): `tmux new -s mySession`
+  - Creating another window: `Ctrl + B` and then `c`
+  - Switching windows: `Ctrl + B` and then `0-9`
+  - Exiting tmux while leaving the session running: `Ctrl + B` and then `d`
+  - Closing the session completely: `exit`
+  - Viewing current tmux sessions: `tmux ls`
+  - Reopening the running session: `tmux a -t mySession`
+
 
 ## Filesystem Hierarchy Standard (FHS)
 
@@ -217,11 +234,11 @@ Notes:
       - use VPN on Windows instead
       - you must connect to the VPN **after** lauching WSL!
 
-## Cluster Computing
+## Remote development
 
 - Basics:
   - The high-performance computing (HPC) clusters are usually Linux servers equipped with some computing job managment softwares
-    - WUSM CHPC uses Slurm on Centos 8
+    - WUSM CHPC uses Slurm on Centos 8 (Update: it's Rock 8.5 now)
     - WUSTL RIS uses LSF
   - End-users usually use SSH to login to the server remotely. They:
     - have their own `$HOME` directory (`/home/username`) as the main workspace, and sometimes another directory for temporary usage (`/scratch/username` for CHPC)
@@ -232,12 +249,15 @@ Notes:
     - Due to the possible conflict between dependencies for different jobs, the server usually manages an environment for each job
     - One traditional way (as it is in CHPC) is to prepare all possible versions of a dependency in the server, and use `module` to specify the environment variables for each job
     - Another way (as it is in RIS) is to use `docker` to encapsule all dependencies of a job into a standalone, platform-independent *container*
+- Some common errors:
+  - Permission denied even after entering correct password in VS Code Remote SSH (+ Linux ssh can work but show message "no more processes"):
+    - Reason: someone is running big jobs and reached the maximum number of allowed processes on the server
+    - Solution: shout out and wait
 - `module`:
   - Use `module avail <package>` to see the available versions of a package
   - Use `module spider <RegExp>` to search for all available packages
   - Use `module load <package/version>` to load a specific version of a package into your environment
   - Use `module unload <package/version>` or `module del <package/version>` to unload
-
 - `ssh` and `scp`:
   - Usually you need to start the ssh service by `sudo service ssh start`
   - Login to remote server: `ssh [parameters] [user@]host[:[port]] [command]`
@@ -256,3 +276,359 @@ Notes:
       - Same as above but change the name of the uploaded file: change `<directory>` to `<directory>/<new_filename>`
       - Upload a local folder to a remote directory: `scp -r <local_folder> <user>@<host>:<directory>`
       - Download is similar, just switching the last two parameters
+- Python:
+  - Basically you just need to activate one version of Python by `module load python/x.x.x`, and then do the following jobs just like you have Anaconda installed
+  - The only difference: after you create an environment, activate it by `source activate xxx`, not `conda activate xxx` (but deactivation and installation etc. are the same)
+- R:
+  - Setup:
+    - Follow [CHPC's instruction](https://sites.wustl.edu/chpc/resources/software/r/) to set up an conda environment and install R packages.
+    - Install [VS Code R](https://marketplace.visualstudio.com/items?itemName=Ikuyadeu.r) and [R debugger](https://github.com/ManuelHentschel/VSCode-R-Debugger) in VS Code
+    - Find `r.rpath.linux` and `r.rterm.linux` in VS Code settings and change both to the path to R executable (`which R`, make sure to expand `~` to `/home/username`)
+    - Open the R terminal in your activate conda environment and:
+      - install [languageserver](https://github.com/REditorSupport/languageserver) by `install.packages("languageserver")`
+      - install [vscDebugger](https://github.com/ManuelHentschel/vscDebugger) by `remotes::install_github("ManuelHentschel/vscDebugger")`. Note that the [recommended way](https://marketplace.visualstudio.com/items?itemName=RDebugger.r-debugger) is not feasible for CHPC.
+    - You may also want to install [httpgd](https://github.com/nx10/httpgd) for faster and better plotting: `install.packages("httpgd")`
+    - You may also want to install [radian](https://github.com/randy3k/radian) for autocomplete and other functions in the R terminal:
+      - `pip3 install --user radian` to install `radian` in `~/.local/bin`
+      - In VS Code, change the path `r.rterm.linux` to `/home/yourname/.local/bin/radian` (don't change `r.rpath.linux`!)
+      - Delete `--no-save` and `--no-restore` in `r.rterm.option` (because `radian` has these parameters as default already)
+      - Set `r.bracketedPaste` as `true` to allow bracket-paste mode
+  - Interaction:
+    - In order to plot and explore your data, you need to use an interactive terminal instead of VS Code debugger
+    - Select the code to execute and then press Ctrl+Enter to send them to an R interactive terminal, then you will see the variables in the R workspace panel on the left
+    - You can examine the dataFrames and plots by executing `View(myvar)` in the interactive terminal
+  - Bugs:
+    - When you use `parallel()` for parallelization, use vanilla R instead of Radian, otherwise it will break
+
+
+
+## Bash
+
+- You need to specify the shell to use for your script at the begining. For example, to use `bash`:
+
+  ```bash
+  #!/bin/bash
+  echo "Hello world!"
+  ```
+
+- How to run:
+
+  - Save the script with postfix `.sh` (it's only a convention, not a requirement) 
+  - Use `chmod +x <filename>` to make your script executable
+  - Run it either by it's full name, or run the shell with the script as a parameter.
+  
+- Variable:
+
+  - Definition and assignment:
+    - NO space between variable name and assignment operator `=`!
+    
+    - can be defined implicitly, like `for myChar in "sdfsdf" `
+    
+    - can be defined as the output of certain commands:
+    
+      ```bash
+      myVar=$(commands)
+      myVar=$(commands [command opt ...] param1 param2 ...)
+      myVar=`commands`
+      myVar=`commands [command opt ...] param1 param2 ...`
+      ```
+    
+  - Reference:
+    - when using a variable `var1`, you should put the variable name [in a curly bracket] after a dollar sign
+    - e.g., `echo ${var1}`
+    
+  - Read only: you can set a variable to read-only by `readonly var_name` (no dollar and bracket, similar below)
+
+  - Delete: `unset var_name`
+
+- String:
+
+  - When your string doesn't contain spaces (which is often the case), you actual don't need to quote it
+
+  - When the string contains spaces, normally we use `""`, which can contain variable reference
+
+  - Content of a string variable cannot be modified after definition.
+
+  - Indexing:
+    - starting from 0
+    - `${var1:i}` substring starting from index i to the end
+    - `${var1:i:j}` substring of length j starting from index i (note: it's NOT i to j or j-1!)
+    - `${var1::j}` substring of length j starting from index 0
+
+  - `${#var1}` returns the length (can not use together with indexing)
+
+  - Concatenation:
+    - just put variables and strings together without spaces
+    - e.g. `"Hello "${var1}" world""!"` is the same as `"Hello ${var1} world!"`
+
+  - Paths:
+
+    - You can use `*`, `?` or so to find out the filenames directly without any extra command:
+
+      ```bash
+      allMkFile=(./*.mk)  # Get a list of all .mk files in current directory
+      ```
+
+    - You can check whether a directory exists by the expression `[ -d "${myPath}" ]` (must keep the spaces! Otherwise `[-d` will be recognized as one token)
+
+- Array:
+
+  - only 1D array; NO restriction on array size
+  - can use ANY non-negative integer as indices; indices can be NOT consecutive
+  - definition:
+    - `myArr=(var1 var2 var3 var4)`, or
+    - `myArr[0]=var1; myArr[100]=var2; myArr[1]=var3`
+  - indexing:
+    - `${myArr[i]}` the element at index i (if there's no such element, no error and returns nothing)
+    - `${myArr[@]}` all elements, in ascending indices
+    - `${myArr[@]:i:j}`
+      - (at most) j elements starting from index i
+      - note that it is NOT the elements with index in range (i, i + j - 1), since index can be inconsecutive!
+      - will return less that j elements (or even nothing) if there's no j elements with index larger or equal to i
+    - `${myArr[@]:i}` and `${myArr[@]::j}`: similar to that in string (but note the difference due to inconsecutive indices)
+  - `${#myArr[@]}` is the length (number of elements) of the array
+
+- Expression:
+
+  - Bash doesn't support many arithmatic and logical operations. You need to call utilities like `expr`, `test` and `[[ ... ]]` to calculate the expressions.
+
+  - Arithmatic operation:
+  
+    ```bash
+    a=1
+    b=2
+    c=`expr $a + $b`
+    d=`expr $a \* $b`
+    e=`expr $b % $a`   # mod
+    ```
+
+    Note:
+
+    - MUST have spaces between operators and variables/numbers!
+    - MUST have escape symbol before `*` (but not others)!
+  
+  - Boolean operation in bash:
+  
+    - There is NO bool type or keyword in bash!
+  
+    - `if, &&, ||, !` takes COMMANDs as its arguments and generates the result according to whether these commands succeed or fail
+  
+      - `true` and `false` (with or without quotes - after all, commands are just strings) are two commands that always succeeds or always fails
+  
+      - a command succeeds when it returns (exits with) **0**, and fails otherwise
+  
+      - `0` itself is not a command, so you cannot use it in logical expression
+  
+      - You can assign `true` and `false` to variables and use them in logical expression.
+  
+      - You can connect commands using `&&, ||` based on their short-circuiting feature:
+  
+        ```bash
+        COMMAND && echo "Succeeded!" || echo "Failed!"
+        ```
+  
+    - `test, [], [[]]` takes operators and operands as arguments
+  
+    - Examples:
+  
+      ```bash
+      myVar="false"
+      myFunc() { return 0; }
+      
+      if false ; then echo "True"; else echo "False"  # False
+      if ${myVar} ; then echo "True"; else echo "False"  # False
+      if [ false ] ; then echo "True"; else echo "False"  # True, since "false" is a non-empty string
+      if myFunc ; then echo "True"; else echo "False"  # True
+      if 0 ; then echo "True"; else echo "False"  # Error "0: command not found" and then "False"
+      ```
+  
+  - Logical expression with `test expression` or `[ expression ]`
+  
+    - Fun fact:
+      - `]` is a normal character, but `[` is not. It is a command!
+      - `/usr/bin/[` is exactly the same as `/usr/bin/test`
+      - when the file is called with name `[` it will search for paired `]`, but not if called with name `test`
+      
+    - Note:
+      - Don't forget the spaces between expression and `[]`
+      
+      - ALWAYS quote your string variables otherwise empty string my give you an error:
+      
+        ```bash
+        myVar=""
+        [ ${myVar} = "" ] && echo "True"  # -bash: [: =: unary operator expected
+        [ "${myVar}" = "" ] && echo "True"  # True
+        [[ ${myVar} = "" ]] && echo "True"  # True
+        ```
+      
+      - Also, make sure don't save your files carelessly with name `test`.
+      
+    - Number comparison: using `-eq`, `-gt`, `-le` instead of `==`, `>`, `<=`, etc.
+  
+    - Logical operator: using `-a, -o, !` instead of `&&, ||, !`
+  
+    - String test:
+      - `=` or `==` whether two strings are the same (similarly `!=`)
+      - `-z` whether a string has length 0
+      - `-n "${str}"` or `${str}` whether a string has non-zero length
+      - `-n ${str}` will always return true!
+      
+    - File test:
+      - `-d xxx` whether `"xxx"` is a directory
+      - `-f xxx` whether it is a file
+      - ...
+  
+  - Logical operation with `[[ ... ]]`:
+  
+    - Only available in bash but not other shells
+    - Similar to `[]`, but can use `&&, ||`
+    - Can also use `<, >`, but it's ASCII comparison instead of numerical!
+    - Can handle empty string variables without quotation
+  
+- Flow control:
+
+  - If block:
+
+    ```bash
+    if condition1
+    then
+        command1
+    elif condition2 
+    then 
+        command2
+    else
+        commandN
+    fi
+    ```
+
+    Note: Bash doesn't allow empty clause. So if you don't need anything for `elif` and `else` just don't write them.
+
+    In one line:
+
+    ```bash
+    if condition; then command1; command2; fi
+    ```
+
+  - While loop:
+
+    ```bash
+    while condition
+    do
+        command
+    done
+    ```
+
+  - For loop:
+
+    ```bash
+    for var in item1 item2 ... itemN
+    do
+        command1
+        command2
+        ...
+        commandN
+    done
+    ```
+
+    Or in one line:
+
+    ```bash
+    for var in item1 item2 ... itemN; do command1; command2… done;
+    ```
+
+    For example, to print out the filenames of all file under current directory with postfix `.mk`:
+
+    ```bash
+    for i in ./*.mk
+    do
+        echo $i
+    done
+    ```
+
+  - Case command:
+
+    ```bash
+    case $variable in
+    pattern-1)
+      commands;;
+    pattern-2 | pattern-3)
+      commands;;
+    pattern-N)
+      commands;;
+    *)
+      commands;;
+    esac
+    ```
+
+    Note: All line breaks are optional. `*)` (default case) is optional.
+
+  - Break loops: `continue`, `break` and `exit <status>` just like other languages.
+
+- Command line parameters:
+
+  - Note: you may want to include these parameters in double quotes when using, in case that they contains spaces
+
+  - Positional parameters:
+
+    - `${0}` is the name (with path) of the current file
+    - `${1}, ${2}, ${3}` and so are the positional parameters
+    - `$#` is the number of parameters received
+    - `$*` concates all parameters into one string
+    - `$@` returns all parameters with quotes
+
+  - Command line options (short):
+
+    - `-a, -h, -z`, etc.
+
+    - using build-in command `getopts`
+
+    - usage:
+
+      ```bash
+      #!/bin/bash
+      echo "OPTIND starts at $OPTIND"
+      while getopts ":pq:" optname
+        do
+          case "$optname" in
+            "p")
+              echo "Option $optname is specified"
+              ;;
+            "q")
+              echo "Option $optname has value $OPTARG"
+              ;;
+            "?")
+              echo "Unknown option $OPTARG"
+              ;;
+            ":")
+              echo "No argument value for option $OPTARG"
+              ;;
+            *)
+            # Should not occur
+              echo "Unknown error while processing options"
+              ;;
+          esac
+          echo "OPTIND is now $OPTIND"
+        done
+      ```
+
+    - explained:
+
+      - `$OPTIND` is the index of the parameter to be processed next
+        - starting from 1
+        - increased by 1 after running `getopts` each time
+        - `getopts` will return `false` when `$OPTIND > $#`
+      - `getopts <optstring> opt_var` processed the next input parameter according to pattern `optstring`, storing the option name in `$opt_var` and corresponding argument (if any) in `$OPTARG`
+      - `<optstring>`:
+        - the colon at the begining indicates silent mode (don't throw error, here for illustration)
+        - the letters are options (`-p` and `-q` here)
+        - a colon following a letter indicates it that has argument
+        - note: the options can be combined with any order, except that arguments must follow their corresponding option immediately (e.g. you can input `-pq blabla` but not `-qp`)
+      - `$opt_var`:
+        - will be the option (e.g. `"p"`) for a correct option
+        - will be `":"` if the option is correct but no required argument is provided
+        - will be `"?"` for unknow option (e.g. if the input option is `-a`). In this case the option name will be stored in `OPTARG` (e.g. `"a"`)
+
+  - Command line options (long):
+
+    - `--help`, etc.
+    - using external tool `getopt`

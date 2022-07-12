@@ -214,3 +214,11 @@
     - You can extract the subject-dependent oscillation bands by estimating the (1/f removed) power spectrum with a *Gaussian mixture model* with several Gaussian bumps.
         - This may prevent the error by neglecting subjects' difference in theta/alpha/... band limits.
 
+
+
+## Control System
+
+- PID controller:
+  - A PID controller aims to minimize the error $e(t)$ between the measurement and a set point by exerting a control signal $u(t)$ that is the sum of three part: proportional, integral, and derivative:
+  - $u(t) = K_p[e(t) + \frac{1}{T_i}\int_0^t e(t)dt + T_d\frac{de(t)}{dt}]$
+  - Transfer function in Laplace domain: $L(s) = K_p[1 + \frac{1}{T_is} + T_ds]$

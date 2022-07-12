@@ -39,6 +39,8 @@ conda list --revisions
 conda install --revision [revision number that you want to go back to (including it)]
 ```
 
+## VS Code
+
 **Using VS Code with conda:**
 
 - The main problem is that the command `conda` is not recognized in the shell unless you are in the user folder (`C:\Users\YOURNAME`), so you cannot activate the environment in your workspace.
@@ -51,7 +53,9 @@ conda install --revision [revision number that you want to go back to (including
     - Reopen all shells
     - Note: this may have some negative influences, see http://go.microsoft.com/fwlink/?LinkID=135170 for explanation
 
+**Tricks in VS Code Python:**
 
+- You can use comment `# %%` in normal `.py` files to define Jupyter-like code blocks and run them in interactive terminal
 
 ## Jupyter Notebook
 
@@ -84,6 +88,21 @@ conda install --revision [revision number that you want to go back to (including
     ```python
     a, *b, c = range(5)  # b = [1, 2, 3]
     ```
+
+- How to get or input any keyword-value pair parameters: using double starred expression
+
+  ```python
+  from matplotlib import pyplot as plt
+  
+  # Definition of plt.plot():
+  # matplotlib.pyplot.plot(*args, scalex=True, scaley=True, data=None, **kwargs)
+  
+  def myPlot(x, y, *args, **kwargs):
+      # args will be a tuple, kwargs will be a dictionary
+      plt.plot(x, y, *args, **kwargs)
+      
+  myPlot(someX, someY, '--k', linewidth=5)  # Can run
+  ```
 
 - How to call the constructor of the grandparent class:
 

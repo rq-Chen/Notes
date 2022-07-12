@@ -45,8 +45,10 @@
   - 从AIC、BIC到WAIC越来越“纯粹”贝叶斯
   - 可以用R的Loo工具包计算（提供数据、参数和log likelihood function）
 - Group-level comparison:
-  - Fixed effect model: multiply all the probabilities from each subject (Bayes factor)
-  - Random effect model: assumes that each subject may belongs to different model, and calculate the probability that one model is better for others (**Exceeding probability**, similar to the effect size) and the probability that this model is true (similar to statistical power)
+  - Fixed effect model:
+    - multiply the ratio of $p(data | model_1)/p(data|model_2)$ (Bayes factor) from each subject
+    - Note: $p(data | model_1) = \int p(data|\theta, model_1) p(\theta|model_1) d\theta$, where $\theta$ are the parameters (e.g., coefficients of a linear model)
+  - Random effect model: assumes that each subject may belongs to different model, and calculate the probability that one model is better for others (**Exceedance probability**, similar to the effect size) and the probability that this model is true (similar to statistical power)
 - cross validation:
   - leave-one-out is actually asymptotically equal to AIC
   - cross validation is also subjected to some limitations
